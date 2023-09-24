@@ -5,125 +5,9 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include "funkcije.h"
 
 #define MULTIPLY_SCORE(bodoviPrije, multiplikator) (bodoviPrije * multiplikator)
-
-typedef struct {
-    char ime[50];
-    char prezime[50];
-    char nadimak[50];
-} Igrac;
-
-void unesiPodatkeIgraca(Igrac* igrac) {
-    printf("Unesite ime: ");
-    scanf("%s", igrac->ime);
-    printf("Unesite prezime: ");
-    scanf("%s", igrac->prezime);
-    printf("Unesite nadimak: ");
-    scanf("%s", igrac->nadimak);
-}
-
-void unesiBodoveUDatoteku(Igrac igrac, int tezinaIgre, int bodoviPoslije) {
-    FILE* file;
-    file = fopen("ljestvica.txt", "a");
-
-    if (file != NULL) {
-        fprintf(file, "%s - %2s - %2s - %2d - %2d\n", igrac.ime, igrac.nadimak, igrac.prezime, tezinaIgre, bodoviPoslije);
-        fclose(file);
-    }
-    else {
-        printf("Nije moguce otvoriti datoteku za pisanje.\n");
-    }
-}
-
-void unesiPodatkeIgracaUDatoteku(Igrac igrac) {
-    FILE* file;
-    file = fopen("igrac.txt", "w");
-
-    if (file != NULL) {
-        fprintf(file, "Ime: %s\nPrezime: %s\nNadimak: %s\n", igrac.ime, igrac.prezime, igrac.nadimak);
-        fclose(file);
-    }
-    else {
-        printf("Nije moguce otvoriti datoteku za pisanje.\n");
-    }
-}
-
-void prikaziLjestvicu() {
-    FILE* file;
-    char linija[200];
-
-    file = fopen("ljestvica.txt", "r");
-
-    if (file != NULL) {
-        printf("\nLjestvica:\n");
-
-        while (fgets(linija, sizeof(linija), file)) {
-            printf("%s", linija);
-        }
-
-        fclose(file);
-    }
-    else {
-        printf("Nema dostupnih rezultata u ljestvici.\n");
-    }
-}
-
-void igrajIgru(int tezinaIgre, Igrac igrac) {
-    int bodoviPrije = 0, bodoviPoslije = 0, brojKrugova = 0, maxBodovi = 0;
-    int multiplikator;
-
-    switch (tezinaIgre) {
-    case 1:
-        maxBodovi = 10;
-        multiplikator = 1;
-        break;
-    case 2:
-        maxBodovi = 7;
-        multiplikator = 2;
-        break;
-    case 3:
-        maxBodovi = 5;
-        multiplikator = 5;
-        break;
-    case 4:
-        maxBodovi = 3;
-        multiplikator = 10;
-        break;
-    default:
-        printf("Nevazeca tezina.\n");
-        return;
-    }
-
-    while (1) {
-        int krugBodovi = rand() % (maxBodovi + 1);
-
-        bodoviPrije = bodoviPrije + krugBodovi;
-        brojKrugova++;
-
-        printf("\nU %d. krugu ste osvojili %d ECTS bodova!\n", brojKrugova, krugBodovi);
-
-        if (krugBodovi == 0) {
-            bodoviPoslije = MULTIPLY_SCORE(bodoviPrije, multiplikator);
-            printf("Ukupno ste osvojili %d ECTS bodova prije mnozenja!\n", bodoviPrije);
-            printf("Ukupno ste osvojili %d ECTS bodova poslije mnozenja!\n", bodoviPoslije);
-            break;
-        }
-
-        printf("Zelite li nastaviti s igrom? (1/0): ");
-        int odgovor;
-        scanf("%d", &odgovor);
-
-        if (odgovor == 0) {
-            bodoviPoslije = MULTIPLY_SCORE(bodoviPrije, multiplikator);
-            printf("Ukupno ste osvojili %d ECTS bodova prije mnozenja!\n", bodoviPrije);
-            printf("Ukupno ste osvojili %d ECTS bodova poslije mnozenja!\n", bodoviPoslije);
-            break;
-        }
-    }
-
-    unesiBodoveUDatoteku(igrac, tezinaIgre, bodoviPoslije);
-}
 
 int main(void) {
     srand(time(NULL));
@@ -139,7 +23,8 @@ int main(void) {
         printf("2. Ljestvica\n");
         printf("3. Brisanje datoteka\n");
         printf("4. Preimenovanje datoteka\n");
-        printf("5. Izlazak iz igre\n");
+        printf("5. Azuriranje rezultata\n");
+        printf("6. Izlazak iz igre\n");
         printf("Odaberite opciju: ");
 
         int izbor;
@@ -180,6 +65,33 @@ int main(void) {
             }
             break;
         case 5:
+            printf("\nIzbornik:\n");
+            printf("1. Azuriranje rezultata po krugovima\n");
+            printf("2. Azuriranje rezultata po bodovima\n");
+            printf("3. Azuriranje rezultata po tezini\n");
+            printf("Odaberite opciju: ");
+
+            int opcijaAzuriranja;
+            scanf("%d", &opcijaAzuriranja);
+
+            switch (opcijaAzuriranja) {
+            case 1:
+                int usporediPoBrojuKrugova(const void* a, const void* b);
+                void azurirajLjestvicuPoBrojuKrugova(Rezultat * rezultati, int brojRezultata);
+                break;
+            case 2:
+                int usporediPoOsvojenimBodovima(const void* a, const void* b);
+                void azurirajLjestvicuPoOsvojenimBodovima(Rezultat * rezultati, int brojRezultata);
+                break;
+            case 3:
+                int usporediPoTeziniIgre(const void* a, const void* b);
+                void azurirajLjestvicuPoTeziniIgre(Rezultat * rezultati, int brojRezultata);
+                break;
+            default:
+                printf("Nevazeci izbor za azuriranje rezultata.\n");
+            }
+            break;
+        case 6:
             printf("\nZelite li izaci iz igre? (1/0): ");
             int odgovor;
             scanf("%d", &odgovor);
